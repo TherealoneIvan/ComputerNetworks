@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Lite Aggregator</title>
+</head>
+
+<body>
+    <div>
+        <form action="/news" method="GET">
+            <input type="text" name="url" placeholder="Ссылка на RSS канал">
+            <br>
+            <input type="submit" value="Получить новости">
+        </form>
+    </div>
+    <div>
+        <h3>Примеры выдачи</h3>
+        <ul>
+            <li>
+                <form action="/news" method="GET">
+                    <input type="hidden" name="url" value="http://blagnews.ru/rss_vk.xml">
+                    <input type="submit" value="http://blagnews.ru/rss_vk.xml">
+                </form>
+            </li>
+            <li>
+                <form action="/news" method="GET">
+                    <input type="hidden" name="url" value="http://www.rssboard.org/files/sample-rss-2.xml">
+                    <input type="submit" value="http://www.rssboard.org/files/sample-rss-2.xml">
+                </form>
+            </li>
+            <li>
+                <form action="/news" method="GET">
+                    <input type="hidden" name="url" value="https://lenta.ru/rss">
+                    <input type="submit" value="https://lenta.ru/rss">
+                </form>
+            </li>
+            <li>
+                <form action="/news" method="GET">
+                    <input type="hidden" name="url" value="https://news.mail.ru/rss/90/">
+                    <input type="submit" value="https://news.mail.ru/rss/90/">
+                </form>
+            </li>
+            <li>
+                <form action="/news" method="GET">
+                    <input type="hidden" name="url"
+                        value="http://technolog.edu.ru/index.php?option=com_k2&view=itemlist&layout=category&task=category&id=8&lang=ru&format=feed">
+                    <input type="submit"
+                        value="http://technolog.edu.ru/index.php?option=com_k2&view=itemlist&layout=category&task=category&id=8&lang=ru&format=feed">
+                </form>
+            </li>
+        </ul>
+    </div>
+</body>
+
+</html>
