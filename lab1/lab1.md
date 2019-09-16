@@ -3,7 +3,7 @@
 ## Разработка ftp клиента
 
 
-Рассматривается задача разработки ftp-клиента на языке GO на основе пакета github.com/jlaffaye/ftp. 
+Рассматривается задача разработки ftp-клиента на языке GO на основе пакета [github.com/jlaffaye/ftp](https://github.com/jlaffaye/ftp). 
 
 **Задача 1:** Реализовать ftp-клиент и запустить его на сервере 185.20.227.83 или 185.20.226.174.
 
@@ -37,8 +37,8 @@ go run example_app.go.
 
 
 Рассматривается задача разработки ftp-сервера на языке GO на основе пакетов:
-- github.com/goftp/file-driver
-- github.com/goftp/server
+- [github.com/goftp/file-driver](https://github.com/goftp/file-driver)
+- [github.com/goftp/server](https://github.com/goftp/server)
 
 **Задача 1:** Реализовать ftp сервер на языке GO с применением указанных пакетов и запустить его на сервере 185.20.227.83 или 185.20.226.174.
 

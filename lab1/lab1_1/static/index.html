@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="data:,">
+    <title>FTP client</title>
+</head>
+
+<body>
+    <h1>{{.CurrentDir}}</h1>
+    <div>
+        <form action="/create" method="GET">
+            <input name="dirname" type="text" placeholder="Введите имя папки">
+            <input type="submit" value="Создать папку">
+        </form>
+    </div>
+    <div>
+            <form action="/upload" method="GET">
+                <input name="uploadedfile" type="file" placeholder="Выберите файл">
+                <input type="submit" value="Загрузить">
+            </form>
+        </div>
+    <div>
+        <table>
+            <tr>
+                <th>
+                    Имя
+                </th>
+                <th>
+                    Размер
+                </th>
+                <th>
+                    Тип
+                </th>
+            </tr>
+            {{range .EntriesList}}
+            <tr>
+                <td>
+                    {{if eq .Content.Type 1 }}
+                    <a href=/client{{.AbsolutePath}}> {{.Content.Name}}</a>
+                    {{else}}
+                    {{.Content.Name}}
+                    {{end}}
+                </td>
+                <td>
+                    {{.Content.Size}} байт
+                </td>
+                <td>
+                    {{.EntryTypeToString}}
+                </td>
+            </tr>
+            {{end}}
+        </table>
+    </div>
+</body>
+
+</html>
