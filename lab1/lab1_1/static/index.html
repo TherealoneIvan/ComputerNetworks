@@ -3,24 +3,29 @@
 
 <head>
     <meta charset="utf-8">
-    <link rel="icon" href="data:,">
     <title>FTP client</title>
+    <link rel="icon" href="data:,">
 </head>
 
 <body>
     <h1>{{.CurrentDir}}</h1>
     <div>
         <form action="/create" method="GET">
+            <input name="curdir" type="hidden" value={{.CurrentDir}}>
             <input name="dirname" type="text" placeholder="Введите имя папки">
             <input type="submit" value="Создать папку">
         </form>
     </div>
     <div>
-            <form action="/upload" method="GET">
-                <input name="uploadedfile" type="file" placeholder="Выберите файл">
-                <input type="submit" value="Загрузить">
-            </form>
-        </div>
+        <form enctype="multipart/form-data" action="/upload" method="POST">
+            <input name="curdir" type="hidden" value={{.CurrentDir}}>
+            <input name="uploadedfile" type="file" placeholder="Выберите файл"><br>
+            <label for="uploadedfile">
+                Максимальный размер файла 10Мб
+            </label><br>
+            <input type="submit" value="Загрузить">
+        </form>
+    </div>
     <div>
         <table>
             <tr>
@@ -33,21 +38,58 @@
                 <th>
                     Тип
                 </th>
+                <th></th>
+                <th></th>
             </tr>
+            {{$dir:= .CurrentDir}}
             {{range .EntriesList}}
             <tr>
                 <td>
                     {{if eq .Content.Type 1 }}
-                    <a href=/client{{.AbsolutePath}}> {{.Content.Name}}</a>
+                    <div>
+                        <a href=/client{{.AbsolutePath}}>
+                            {{.Content.Name}}
+                        </a>
+                    </div>
                     {{else}}
-                    {{.Content.Name}}
+                    <div>
+                        <p>
+                            {{.Content.Name}}
+                        </p>
+                    </div>
                     {{end}}
                 </td>
                 <td>
-                    {{.Content.Size}} байт
+                    <div>
+                        <p>
+                            {{.Content.Size}} байт
+                        </p>
+                    </div>
                 </td>
                 <td>
-                    {{.EntryTypeToString}}
+                    <div>
+                        <p>
+                            {{.EntryTypeToString}}
+                        </p>
+                    </div>
+                </td>
+                <td>
+                    {{if eq .Content.Type 0 }}
+                    <form action="/download" method="GET">
+                        <input name="curdir" type="hidden" value={{$dir}}>
+                        <input name="filename" type="hidden" value={{.Content.Name}}>
+                        <input type="submit" value="Скачать">
+                    </form>
+                    {{end}}
+                </td>
+                <td>
+                    {{if eq .Content.Type 0 }}
+                    <form action="/deletefile" method="GET">
+                        <input name="curdir" type="hidden" value={{$dir}}>
+                        <input name="filename" type="hidden" value={{.Content.Name}}>
+                        <input type="submit" value="Удалить">
+                    </form>
+                    {{end}}
                 </td>
             </tr>
             {{end}}
