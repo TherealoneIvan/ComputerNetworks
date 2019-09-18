@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Auth</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+
+<body>
+    <header>
+        <h1>
+            Авторизация на FTP сервере
+        </h1>
+    </header>
+    <div id="container">
+        <form id="authForm" action="/auth" method="POST">
+            <input id="host" name="host" type="text">
+            <label for="host">
+                Адрес сервера
+            </label>
+            <input id="port" name="port" type="number">
+            <label for="port">
+                Порт
+            </label>
+            <input id="login" name="login" type="text">
+            <label for="login">
+                Логин
+            </label>
+            <input id="password" name="password" type="password">
+            <label for="password">
+                Пароль
+            </label>
+            <input type="submit" value="Авторизироваться">
+        </form>
+    </div>
+</body>
+
+</html>

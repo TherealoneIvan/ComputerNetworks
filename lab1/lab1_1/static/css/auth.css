@@ -1,0 +1,12 @@
+#container {
+    width: 300px;
+    margin: 0 auto;
+}
+
+#authForm, h1 {
+    text-align: center
+}
+
+input {
+    margin: 10px;
+}

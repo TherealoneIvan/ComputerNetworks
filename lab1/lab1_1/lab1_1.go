@@ -1,8 +1,10 @@
 package main
 
 import (
-	"errors"        // пакет для работы с ошибками
-	"flag"          // пакет для работы с аргументами командной строки
+	"errors" // пакет для работы с ошибками
+	"strconv"
+
+	// пакет для работы с аргументами командной строки
 	"fmt"           // пакет для форматированного ввода вывода
 	"html/template" // пакет для шаблонизации HTML документов
 	"io"            // пакет для работы с вводом/выводом
@@ -95,6 +97,23 @@ func FTPAuth(path string, w http.ResponseWriter) *ftp.ServerConn {
 	}
 
 	return c
+}
+
+// AuthRouterHandler : Запись данных для авторизации на FTP сервере
+func AuthRouterHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	host = r.Form["host"][0]
+	i, err := strconv.Atoi(r.Form["port"][0])
+	if err != nil {
+		ErrorHandling(err, "/", w)
+		return
+	}
+	port = i
+	login = r.Form["login"][0]
+	password = r.Form["password"][0]
+
+	http.Redirect(w, r, "/client/", 301)
 }
 
 // ClientRouterHandler : Обработчик запросов ко клиенту
@@ -278,26 +297,20 @@ func DeleteFileRouterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// установить указатели значений аргументов командной строки по ключам
-	// на глобальные переменные аутентификации
-	flag.StringVar(&host, "h", "students.yss.su", "ftp server address")
-	flag.IntVar(&port, "port", 21, "port of ftp server")
-	flag.StringVar(&login, "l", "ftpiu8", "login for ftp auth")
-	flag.StringVar(&password, "p", "3Ru7yOTA", "password for ftp auth")
-	flag.Parse()
-
-	// для отладки
-	fmt.Println(host)
-	fmt.Println(port)
-	fmt.Println(login)
-	fmt.Println(password)
+	// установка дефолтных значений глобальных переменных аутентификации
+	host = "students.yss.su"
+	port = 21
+	login = "ftpiu8"
+	password = "3Ru7yOTA"
 
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./static/css")))) // доступ к стилям
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/client", 301)
-	}) // редирект на action client с запроса по адресу веб-сервера
+		http.ServeFile(w, r, "static/auth.html")
+	}) // возврат страница авторизации по запросу домашней страницы
 
+	// установка обработчиков запросов
+	http.HandleFunc("/auth", AuthRouterHandler)
 	http.HandleFunc("/client/", ClientRouterHandler)
 	http.HandleFunc("/create", CreateRouterHandler)
 	http.HandleFunc("/upload", UploadRouterHandler)

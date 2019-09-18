@@ -5,18 +5,23 @@
     <meta charset="utf-8">
     <title>FTP client</title>
     <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/css/client.css">
 </head>
 
 <body>
-    <h1>{{.CurrentDir}}</h1>
-    <div>
+    <header>
+        <h1>
+            {{.CurrentDir}}
+        </h1>
+    </header>
+    <div id="createDir">
         <form action="/create" method="GET">
             <input name="curdir" type="hidden" value={{.CurrentDir}}>
             <input name="dirname" type="text" placeholder="Введите имя папки">
             <input type="submit" value="Создать папку">
         </form>
     </div>
-    <div>
+    <div id="uploadFile">
         <form enctype="multipart/form-data" action="/upload" method="POST">
             <input name="curdir" type="hidden" value={{.CurrentDir}}>
             <input name="uploadedfile" type="file" placeholder="Выберите файл"><br>
@@ -26,7 +31,7 @@
             <input type="submit" value="Загрузить">
         </form>
     </div>
-    <div>
+    <div id="content">
         <table>
             <tr>
                 <th>

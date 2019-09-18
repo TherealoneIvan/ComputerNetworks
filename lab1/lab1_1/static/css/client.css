@@ -1,0 +1,7 @@
+#createDir, #uploadFile, #content {
+    margin: 15px;
+}
+
+#uploadFile>form>input {
+    margin: 7px;
+}
