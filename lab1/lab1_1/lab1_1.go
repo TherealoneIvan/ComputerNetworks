@@ -1,7 +1,7 @@
 package main
 
 import (
-	"errors" // пакет для работы с ошибками
+	// пакет для работы с ошибками
 	"strconv"
 
 	// пакет для работы с аргументами командной строки
@@ -55,10 +55,10 @@ func (ee EntryExtended) EntryTypeToString() string {
 }
 
 // EntriesByType : Возвращает список вхождений по заданному типу вхождения, отсортированный по алфавиту
-func EntriesByType(path string, conn *ftp.ServerConn, etype ftp.EntryType) []EntryExtended {
+func EntriesByType(path string, conn *ftp.ServerConn, etype ftp.EntryType) ([]EntryExtended, error) {
 	entries, err := conn.List(path)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	var filteredEntries []EntryExtended
 	for _, entry := range entries {
@@ -72,7 +72,7 @@ func EntriesByType(path string, conn *ftp.ServerConn, etype ftp.EntryType) []Ent
 	sort.Slice(filteredEntries, func(i, j int) bool {
 		return strings.Compare(filteredEntries[i].Content.Name, filteredEntries[j].Content.Name) == -1
 	})
-	return filteredEntries
+	return filteredEntries, nil
 }
 
 // ErrorHandling : Возврат клиенту информации о произошедшей ошибке
@@ -127,24 +127,28 @@ func ClientRouterHandler(w http.ResponseWriter, r *http.Request) {
 	c := FTPAuth(path, w)
 
 	var entries []EntryExtended
-	entries = append(entries, EntriesByType(path, c, ftp.EntryTypeFolder)...) // папки
-	entries = append(entries, EntriesByType(path, c, ftp.EntryTypeFile)...)   // файлы
-	entries = append(entries, EntriesByType(path, c, ftp.EntryTypeLink)...)   // ссылки
+	files, err := EntriesByType(path, c, ftp.EntryTypeFolder) // папки
+	if err != nil {
+		ErrorHandling(err, path, w)
+		return
+	}
+	folders, err := EntriesByType(path, c, ftp.EntryTypeFile) // файлы
+	links, err := EntriesByType(path, c, ftp.EntryTypeLink)   // ссылки
+
+	entries = append(entries, files...)
+	entries = append(entries, folders...)
+	entries = append(entries, links...)
 
 	if err := c.Quit(); err != nil {
 		ErrorHandling(err, path, w)
 		return
 	}
 
-	if len(entries) == 0 {
-		ErrorHandling(errors.New("No such file or directory"), path, w)
-	} else {
-		tmplt := template.Must(template.ParseFiles("static/index.html"))
-		data := EntriesPageData{
-			EntriesList: entries,
-			CurrentDir:  path}
-		tmplt.Execute(w, data) // отправляем данные на клиентскую сторону
-	}
+	tmplt := template.Must(template.ParseFiles("static/index.html"))
+	data := EntriesPageData{
+		EntriesList: entries,
+		CurrentDir:  path}
+	tmplt.Execute(w, data) // отправляем данные на клиентскую сторону
 }
 
 // CreateRouterHandler : Обработчик запроса на создание директории
