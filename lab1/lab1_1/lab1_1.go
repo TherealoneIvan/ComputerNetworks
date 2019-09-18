@@ -1,18 +1,25 @@
 package main
 
 import (
-	"errors"
+	"errors"        // пакет для работы с ошибками
+	"flag"          // пакет для работы с аргументами командной строки
 	"fmt"           // пакет для форматированного ввода вывода
 	"html/template" // пакет для шаблонизации HTML документов
-	"io"
-	"log"      // пакет для логирования
-	"net/http" // пакет для поддержки HTTP протокола
-	"sort"     // пакет для сортировки
-	"strings"  // пакет для работы с  UTF-8 строками
-	"time"     // пакет для работы со временем
+	"io"            // пакет для работы с вводом/выводом
+	"log"           // пакет для логирования
+	"net/http"      // пакет для поддержки HTTP протокола
+	"sort"          // пакет для сортировки
+	"strings"       // пакет для работы с  UTF-8 строками
+	"time"          // пакет для работы со временем
 
 	"github.com/jlaffaye/ftp" //пакет для написания FTP клиента
 )
+
+// данные авторизации
+var host string // адрес ftp сервера
+var port int    // порт ftp сервера
+var login string
+var password string
 
 // EntryExtended extension of Entry type
 type EntryExtended struct {
@@ -77,12 +84,12 @@ func ErrorHandling(e error, path string, w http.ResponseWriter) {
 
 // FTPAuth : Авторизация на FTP сервере
 func FTPAuth(path string, w http.ResponseWriter) *ftp.ServerConn {
-	c, err := ftp.Dial("students.yss.su:21", ftp.DialWithTimeout(5*time.Second)) // соединение с ftp сервером
+	c, err := ftp.Dial(fmt.Sprintf("%s:%d", host, port), ftp.DialWithTimeout(5*time.Second)) // соединение с ftp сервером
 	if err != nil {
 		ErrorHandling(err, path, w)
 	}
 
-	err = c.Login("ftpiu8", "3Ru7yOTA") // авторизация на сервере
+	err = c.Login(login, password) // авторизация на сервере
 	if err != nil {
 		ErrorHandling(err, path, w)
 	}
@@ -271,6 +278,20 @@ func DeleteFileRouterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// установить указатели значений аргументов командной строки по ключам
+	// на глобальные переменные аутентификации
+	flag.StringVar(&host, "h", "students.yss.su", "ftp server address")
+	flag.IntVar(&port, "port", 21, "port of ftp server")
+	flag.StringVar(&login, "l", "ftpiu8", "login for ftp auth")
+	flag.StringVar(&password, "p", "3Ru7yOTA", "password for ftp auth")
+	flag.Parse()
+
+	// для отладки
+	fmt.Println(host)
+	fmt.Println(port)
+	fmt.Println(login)
+	fmt.Println(password)
+
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./static/css")))) // доступ к стилям
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
