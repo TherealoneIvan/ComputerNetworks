@@ -5,3 +5,9 @@
 #uploadFile>form>input {
     margin: 7px;
 }
+
+#authLink {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
