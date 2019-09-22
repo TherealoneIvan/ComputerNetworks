@@ -17,7 +17,7 @@ func NewsRouterHandler(w http.ResponseWriter, r *http.Request) {
 	var response strings.Builder // конструктор HTML-строки ответа
 
 	response.WriteString("<div>")
-	response.WriteString("<form action=\"http://localhost:8017\" method=\"GET\"><input type=\"submit\" value=\"К списку каналов\"></form>")
+	response.WriteString("<a href=\"/\">К списку каналов</a>")
 
 	url := r.Form["url"][0] //ссылка на RSS канал
 	rssObject, rssErr := rss.ParseRSS(url)

@@ -20,7 +20,7 @@ func HomeRouterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	response.WriteString("</ul>")
 	if r.URL.Path != "/info" {
-		response.WriteString("<iframe src=\"http://localhost:8017/info?lang=go&version=1.12.7&os=windows\">Link</iframe>")
+		response.WriteString("<iframe src=\"/info?lang=go&version=1.12.7&os=windows\">Link</iframe>")
 	}
 	fmt.Fprintf(w, response.String()) // отправляем данные на клиентскую сторону
 }
