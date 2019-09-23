@@ -68,7 +68,7 @@ func (c Command) Execute(conn *ftp.ServerConn) {
 		}
 		defer data.Close()
 
-		file, err := os.Create(fmt.Sprintf("%s/%d.zip", c.Path, time.Now().Unix()))
+		file, err := os.Create(fmt.Sprintf("%s/%s.zip", c.Path, c.Arg))
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -80,13 +80,13 @@ func (c Command) Execute(conn *ftp.ServerConn) {
 			fmt.Println(err)
 		}
 	case Stor:
-		file, err := os.Open(c.Arg)
+		file, err := os.Open(fmt.Sprintf("%s/%s", c.Path, c.Arg))
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 		reader := bufio.NewReader(file)
-		err = conn.Stor(file.Name(), reader)
+		err = conn.Stor(c.Arg, reader)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -173,7 +173,6 @@ func main() {
 		s := scanner.Text()
 
 		command.Value = s
-		command.Path = path
 
 		re.ReplaceAllString(s, " ")
 		data := strings.Split(s, " ")
@@ -202,13 +201,15 @@ func main() {
 				return
 			}
 			command.Arg = data[1]
+			command.Path = path
 			command.Type = Retr
 		case "stor":
-			if len(data) < 2 {
+			if len(data) < 3 {
 				fmt.Println(errors.New("err: missing Args"))
 				return
 			}
 			command.Arg = data[1]
+			command.Path = data[2]
 			command.Type = Stor
 		case "rm":
 			if len(data) < 2 {
