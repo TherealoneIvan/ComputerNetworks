@@ -46,6 +46,12 @@ func main() {
 				command := parseCommand(text)
 
 				switch command[0] {
+				case "echo":
+					if len(command) < 2 {
+						io.WriteString(s, fmt.Sprintf("%s: missing arg\n", command[0]))
+					} else {
+						io.WriteString(s, fmt.Sprintf("%s\n", command[1]))
+					}
 				case "ls":
 					files, err := ioutil.ReadDir("./")
 					if err != nil {
