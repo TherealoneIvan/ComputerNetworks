@@ -15,6 +15,7 @@ import (
 )
 
 func parseCommand(s string) []string {
+	s = strings.TrimRight(s, "\n")
 	re := regexp.MustCompile(`\s+`)
 	re.ReplaceAllString(s, " ")
 	data := strings.Split(s, " ")
@@ -32,6 +33,7 @@ func main() {
 		Addr: fmt.Sprintf(":%d", port),
 		Handler: func(s ssh.Session) {
 			io.WriteString(s, fmt.Sprintf("You've been connected to %s\n", s.LocalAddr().String()))
+		loop:
 			for {
 				text, err := bufio.NewReader(s).ReadString('\n')
 
@@ -74,14 +76,13 @@ func main() {
 							io.WriteString(s, err.Error())
 						}
 					}
-				}
-				if command[0] == "exit" {
-					break
+				case "exit":
+					break loop
 				}
 			}
 			err := s.Exit(0)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println(err)
 			}
 		},
 		PasswordHandler: func(ctx ssh.Context, password string) bool {
