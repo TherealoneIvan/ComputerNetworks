@@ -7,9 +7,19 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"os"
+	"regexp"
+	"strings"
 
 	"github.com/gliderlabs/ssh"
 )
+
+func parseCommand(s string) []string {
+	re := regexp.MustCompile(`\s+`)
+	re.ReplaceAllString(s, " ")
+	data := strings.Split(s, " ")
+	return data
+}
 
 func main() {
 	var port int
@@ -24,22 +34,49 @@ func main() {
 			io.WriteString(s, fmt.Sprintf("You've been connected to %s\n", s.LocalAddr().String()))
 			for {
 				text, err := bufio.NewReader(s).ReadString('\n')
+
 				if err != nil {
 					fmt.Println("GetLines: " + err.Error())
 					break
 				}
+
 				fmt.Println(text)
-				if text == "exit\n" {
-					break
-				} else if text == "ls\n" {
+				command := parseCommand(text)
+
+				switch command[0] {
+				case "ls":
 					files, err := ioutil.ReadDir("./")
 					if err != nil {
 						fmt.Println(err)
+						io.WriteString(s, err.Error())
 					}
 
 					for _, f := range files {
 						io.WriteString(s, fmt.Sprintf("%s\n", f.Name()))
 					}
+				case "mkdir":
+					if len(command) < 2 {
+						io.WriteString(s, fmt.Sprintf("%s: missing arg\n", command[0]))
+					} else {
+						err := os.Mkdir(command[1], os.ModeDir)
+						if err != nil {
+							fmt.Println(err)
+							io.WriteString(s, err.Error())
+						}
+					}
+				case "rmdir":
+					if len(command) < 2 {
+						io.WriteString(s, fmt.Sprintf("%s: missing arg\n", command[0]))
+					} else {
+						err := os.Remove(command[1])
+						if err != nil {
+							fmt.Println(err)
+							io.WriteString(s, err.Error())
+						}
+					}
+				}
+				if command[0] == "exit" {
+					break
 				}
 			}
 			err := s.Exit(0)
