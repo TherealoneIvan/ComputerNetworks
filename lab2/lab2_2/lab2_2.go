@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 
 	"github.com/gliderlabs/ssh"
@@ -25,18 +26,25 @@ func main() {
 				text, err := bufio.NewReader(s).ReadString('\n')
 				if err != nil {
 					fmt.Println("GetLines: " + err.Error())
-					err = s.Exit(-1)
-					if err != nil {
-						log.Fatal(err)
-					}
+					break
 				}
 				fmt.Println(text)
-				if text == "exit" {
-					err = s.Exit(0)
+				if text == "exit\n" {
+					break
+				} else if text == "ls\n" {
+					files, err := ioutil.ReadDir("./")
 					if err != nil {
-						log.Fatal(err)
+						fmt.Println(err)
+					}
+
+					for _, f := range files {
+						io.WriteString(s, fmt.Sprintf("%s\n", f.Name()))
 					}
 				}
+			}
+			err := s.Exit(0)
+			if err != nil {
+				log.Fatal(err)
 			}
 		},
 		PasswordHandler: func(ctx ssh.Context, password string) bool {
