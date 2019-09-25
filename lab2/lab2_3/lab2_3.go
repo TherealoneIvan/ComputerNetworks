@@ -74,9 +74,6 @@ loop:
 			break loop
 		}
 		log.Println(line)
-		if command[0] != "" {
-			term.Write(append([]byte(command[0]), '\n'))
-		}
 	}
 	log.Println("terminal closed")
 }
