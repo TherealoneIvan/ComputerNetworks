@@ -83,9 +83,21 @@ func VInfoRouterHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(getVacancyInfo(getDivisions()))
 }
 
+// DivsRouterHandler : Отдаёт список сфер деятельности с сайта moikrug в формате json
+func DivsRouterHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	// десереализация JSON ответа от сервера сайта "Мой круг"
+	divjson := getDivisions()
+	var wrapper DivisionWrapper
+	json.Unmarshal(divjson, &wrapper)
+	result, _ := json.Marshal(wrapper.Content)
+	w.Write(result)
+}
+
 func main() {
-	http.HandleFunc("/getvinfo", VInfoRouterHandler) // установим роутер
-	err := http.ListenAndServe(":8017", nil)         // задаем слушать порт
+	http.HandleFunc("/getvinfo", VInfoRouterHandler)
+	http.HandleFunc("/getdivisions", DivsRouterHandler)
+	err := http.ListenAndServe(":8017", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
