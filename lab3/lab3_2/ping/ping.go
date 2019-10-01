@@ -9,7 +9,9 @@ import (
 
 func main() {
 	var host string
+	var isPrivileged bool
 	flag.StringVar(&host, "host", "www.google.com", "host to ping")
+	flag.BoolVar(&isPrivileged, "prvlgd", false, "for pinger.SetPriveleged()")
 	flag.Parse()
 
 	pinger, err := ping.NewPinger(host)
@@ -32,6 +34,6 @@ func main() {
 
 	pinger.Count = 1
 	fmt.Printf("PING %s (%s):\n", pinger.Addr(), pinger.IPAddr())
-	pinger.SetPrivileged(true)
+	pinger.SetPrivileged(isPrivileged)
 	pinger.Run()
 }
