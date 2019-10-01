@@ -1,14 +1,8 @@
 [
     {
-        "user": "",
-        "password": "",
-        "host": "",
-        "port": 1
-    },
-    {
-        "user": "",
-        "password": "",
-        "host": "",
-        "port": 1
+        "user": "iu9_student",
+        "password": "BMSTU_the_best",
+        "host": "185.20.227.83",
+        "port": 2217
     }
 ]
