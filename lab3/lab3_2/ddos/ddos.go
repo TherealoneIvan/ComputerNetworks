@@ -22,12 +22,14 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/sparrc/go-ping"
 )
 
 func main() {
 	fmt.Println("[Notice] To quit press: CTRL+C")
+	timeout := time.After(5 * time.Second)
 	for {
 		fmt.Println("Please type the ip that you want to DDoS...")
 		scanner := bufio.NewScanner(os.Stdin)
@@ -58,6 +60,10 @@ func main() {
 			for !stop {
 				fmt.Print("Stopping the process...")
 			}
+		}
+		select {
+		case <-timeout:
+			fmt.Println("Timed out!")
 		}
 	}
 }
