@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -32,23 +33,45 @@ func main() {
 		Addr: fmt.Sprintf(":%d", port),
 		Handler: func(s ssh.Session) {
 			io.WriteString(s, fmt.Sprintf("You've been connected to %s\n", s.LocalAddr().String()))
+		loop:
 			for {
 				text, err := bufio.NewReader(s).ReadString('\n')
-
 				if err != nil {
 					fmt.Println("GetLines: " + err.Error())
 					break
 				}
-
 				fmt.Println(text)
+
 				command := parseCommand(text)
 
-				out, err := exec.Command(command[0], command[1:]...).Output()
-				if err != nil {
-					log.Fatal(err)
+				switch command[0] {
+				case "echo":
+					if len(command) < 2 {
+						io.WriteString(s, fmt.Sprintf("%s: missing arg\n", command[0]))
+					} else {
+						io.WriteString(s, fmt.Sprintf("%s\n", command[1]))
+					}
+				case "exit":
+					break loop
+				case "cd":
+					if len(command) < 2 {
+						home, _ := os.UserHomeDir()
+						os.Chdir(home)
+					} else {
+						err := os.Chdir(command[1])
+						if err != nil {
+							io.WriteString(s, err.Error())
+						}
+					}
+				default:
+					out, err := exec.Command(command[0], command[1:]...).Output()
+					if err != nil {
+						io.WriteString(s, err.Error())
+					}
+					io.WriteString(s, string(out))
 				}
-				io.WriteString(s, string(out))
 			}
+
 			err := s.Exit(0)
 			if err != nil {
 				fmt.Println(err)
