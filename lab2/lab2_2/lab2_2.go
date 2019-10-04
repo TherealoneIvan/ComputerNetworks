@@ -55,7 +55,7 @@ func main() {
 					break loop
 				case "cd":
 					if len(command) < 2 {
-						home, _ := os.UserHomeDir()
+						home := os.Getenv("HOME")
 						os.Chdir(home)
 					} else {
 						err := os.Chdir(command[1])
