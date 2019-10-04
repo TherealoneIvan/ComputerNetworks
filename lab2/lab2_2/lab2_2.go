@@ -5,9 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
-	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 
@@ -33,7 +32,6 @@ func main() {
 		Addr: fmt.Sprintf(":%d", port),
 		Handler: func(s ssh.Session) {
 			io.WriteString(s, fmt.Sprintf("You've been connected to %s\n", s.LocalAddr().String()))
-		loop:
 			for {
 				text, err := bufio.NewReader(s).ReadString('\n')
 
@@ -45,46 +43,11 @@ func main() {
 				fmt.Println(text)
 				command := parseCommand(text)
 
-				switch command[0] {
-				case "echo":
-					if len(command) < 2 {
-						io.WriteString(s, fmt.Sprintf("%s: missing arg\n", command[0]))
-					} else {
-						io.WriteString(s, fmt.Sprintf("%s\n", command[1]))
-					}
-				case "ls":
-					files, err := ioutil.ReadDir("./")
-					if err != nil {
-						fmt.Println(err)
-						io.WriteString(s, err.Error())
-					}
-
-					for _, f := range files {
-						io.WriteString(s, fmt.Sprintf("%s\n", f.Name()))
-					}
-				case "mkdir":
-					if len(command) < 2 {
-						io.WriteString(s, fmt.Sprintf("%s: missing arg\n", command[0]))
-					} else {
-						err := os.Mkdir(command[1], os.ModeDir)
-						if err != nil {
-							fmt.Println(err)
-							io.WriteString(s, err.Error())
-						}
-					}
-				case "rmdir":
-					if len(command) < 2 {
-						io.WriteString(s, fmt.Sprintf("%s: missing arg\n", command[0]))
-					} else {
-						err := os.Remove(command[1])
-						if err != nil {
-							fmt.Println(err)
-							io.WriteString(s, err.Error())
-						}
-					}
-				case "exit":
-					break loop
+				out, err := exec.Command(command[0], command[1:]...).Output()
+				if err != nil {
+					log.Fatal(err)
 				}
+				io.WriteString(s, string(out))
 			}
 			err := s.Exit(0)
 			if err != nil {
