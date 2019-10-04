@@ -62,7 +62,7 @@ func main() {
 					if err != nil {
 						io.WriteString(s, err.Error())
 					}
-					io.WriteString(s, string(out))
+					io.WriteString(s, fmt.Sprintf("%s\n", string(out)))
 				}
 			}
 
