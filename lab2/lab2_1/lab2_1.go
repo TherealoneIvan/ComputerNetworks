@@ -61,12 +61,10 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		s := scanner.Text()
-		fmt.Fprintf(stdin, "echo %s\n", "===========================")
 		_, err = fmt.Fprintf(stdin, "%s\n", s)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Fprintf(stdin, "echo %s\n", "===========================")
 		if s == "exit" {
 			break
 		}
