@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/gliderlabs/ssh"
-	gossh "golang.org/x/crypto/ssh"
 )
 
 func parseCommand(s string) []string {
@@ -58,6 +57,12 @@ func main() {
 							io.WriteString(s, err.Error())
 						}
 					}
+				case "echo":
+					if len(command) < 2 {
+						io.WriteString(s, "\n")
+					} else {
+						io.WriteString(s, strings.Join(command[1:], " "))
+					}
 				default:
 					out, err := exec.Command(command[0], command[1:]...).Output()
 					if err != nil {
@@ -74,12 +79,6 @@ func main() {
 		},
 		PasswordHandler: func(ctx ssh.Context, password string) bool {
 			return ctx.User() == "iu9_student" && password == "BMSTU_the_best"
-		},
-		RequestHandlers: map[string]ssh.RequestHandler{
-			"exec": func(ctx ssh.Context, srv *ssh.Server, req *gossh.Request) (ok bool, payload []byte) {
-				fmt.Println("exec")
-				return false, make([]byte, 1)
-			},
 		},
 	}
 
