@@ -1,6 +1,7 @@
 .list-group-item {
     border: 0px !important;
-    font-size: 1.5rem;
+    font-size: 0.9rem;
+    padding: .3rem .625rem
 }
 
 .command {

@@ -27,6 +27,7 @@ type SSHIdentity struct {
 // Output is a wrapper for response from this server
 type Output struct {
 	List []string `json:"list"`
+	Path string   `json:"path"`
 }
 
 func parseCommand(s string) []string {
@@ -74,6 +75,7 @@ func ExecuteRouterHandler(w http.ResponseWriter, r *http.Request) {
 	var identity SSHIdentity
 	response := Output{
 		List: []string{},
+		Path: ".",
 	}
 	cmd := parseCommand(r.Form["command"][0])
 	divider := fmt.Sprintf("cmd:%s", strings.Join(cmd, " "))
@@ -122,14 +124,19 @@ func ExecuteRouterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// отправка команд
+	fmt.Fprintf(stdin, "cd %s\n", r.Form["path"][0])
 	fmt.Fprintf(stdin, "echo %s\n", divider)
 	fmt.Fprintln(stdin, strings.Join(cmd, " "))
+	fmt.Fprintln(stdin, "echo getpath")
+	fmt.Fprintln(stdin, "pwd")
 	fmt.Fprintln(stdin, "exit")
 	// чтение вывода
 	out, _ := ioutil.ReadAll(stdout)
 	outstr := string(out)
 	fmt.Println(outstr)
-	response.List = strings.Split(outstr[strings.Index(outstr, divider+"\n")+len(divider)+1:], "\n")
+	outstr = outstr[strings.Index(outstr, divider+"\n")+len(divider)+1 : strings.Index(outstr, "getpath\n")]
+	response.List = strings.Split(outstr, "\n")
+	response.Path = string(out)[strings.Index(string(out), "getpath\n")+len("getpath\n"):]
 
 	result, _ := json.Marshal(response)
 	w.Write(result)
