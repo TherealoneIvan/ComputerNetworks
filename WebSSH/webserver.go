@@ -133,7 +133,6 @@ func ExecuteRouterHandler(w http.ResponseWriter, r *http.Request) {
 	// чтение вывода
 	out, _ := ioutil.ReadAll(stdout)
 	outstr := string(out)
-	fmt.Println(outstr)
 	outstr = outstr[strings.Index(outstr, divider+"\n")+len(divider)+1 : strings.Index(outstr, "getpath\n")]
 	response.List = strings.Split(outstr, "\n")
 	response.Path = string(out)[strings.Index(string(out), "getpath\n")+len("getpath\n"):]
