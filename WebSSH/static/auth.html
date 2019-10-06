@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Auth</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+
+<body class="bg-light">
+    <nav class="navbar navbar-light bg-light">
+        <h1 class="navbar-brand font-weight-light mx-auto">Авторизация на SSH сервере</h1>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="container">
+                    <form class="w-25 mx-auto" method="POST" action="/auth">
+                        <div class="form-group">
+                            <div class="form-group">
+                                <label for="host">Адрес сервера</label>
+                                <input type="text" class="form-control" id="host" name="host" placeholder="127.0.0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="port">Порт</label>
+                                <input type="number" class="form-control" id="port" name="port" placeholder="22">
+                            </div>
+                            <div class="form-group">
+                                <label for="login">Логин</label>
+                                <input type="text" class="form-control" id="login" name="login" placeholder="Login">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Пароль</label>
+                                <input type="password" class="form-control" id="password" name="password"
+                                    placeholder="Password">
+                            </div>
+                            <button type="submit" class="btn btn-outline-primary">Авторизоваться</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

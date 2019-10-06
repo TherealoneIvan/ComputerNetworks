@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Web console</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/console.css">
+</head>
+
+<body class="bg-light">
+    <div class="container">
+        <div class="row h-25">
+            <div class="col py-5">
+                <form>
+                    <div class="form-row align-items-center">
+                        <div class="col-auto w-75">
+                            <input type="text" class="form-control form-control-lg text-center" id="cmd"
+                                placeholder="Введите команду здесь">
+                        </div>
+                        <div id="execcmd" class="col-auto">
+                            <button type="button" class="btn btn-outline-dark form-control-lg">Выполнить</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="container bg-dark">
+                    <ul id="console" class="list-group">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="js/script.js"></script>
+</body>
+
+</html>

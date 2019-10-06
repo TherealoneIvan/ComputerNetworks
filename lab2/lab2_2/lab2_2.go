@@ -61,7 +61,7 @@ func main() {
 					if len(command) < 2 {
 						io.WriteString(s, "\n")
 					} else {
-						io.WriteString(s, strings.Join(command[1:], " "))
+						io.WriteString(s, strings.Join(command[1:], " ")+"\n")
 					}
 				default:
 					out, err := exec.Command(command[0], command[1:]...).Output()

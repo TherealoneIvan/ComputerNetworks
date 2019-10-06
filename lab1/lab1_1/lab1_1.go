@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"           // пакет для форматированного ввода вывода
 	"html/template" // пакет для шаблонизации HTML документов
 	"io"            // пакет для работы с вводом/выводом
@@ -14,11 +16,13 @@ import (
 	"github.com/jlaffaye/ftp" //пакет для написания FTP клиента
 )
 
-// данные авторизации
-var host string // адрес ftp сервера
-var port int    // порт ftp сервера
-var login string
-var password string
+// FTPIdentity represents data for auth
+type FTPIdentity struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
 
 // EntryExtended extension of Entry type
 type EntryExtended struct {
@@ -82,15 +86,37 @@ func ErrorHandling(e error, path string, w http.ResponseWriter) {
 }
 
 // FTPAuth : Авторизация на FTP сервере
-func FTPAuth(path string, w http.ResponseWriter) *ftp.ServerConn {
-	c, err := ftp.Dial(fmt.Sprintf("%s:%d", host, port), ftp.DialWithTimeout(5*time.Second)) // соединение с ftp сервером
+func FTPAuth(path string, w http.ResponseWriter, r *http.Request) *ftp.ServerConn {
+	var identity FTPIdentity
+
+	cookie, err := r.Cookie("identity")
 	if err != nil {
 		ErrorHandling(err, path, w)
+		return nil
 	}
 
-	err = c.Login(login, password) // авторизация на сервере
+	data, err := base64.StdEncoding.DecodeString(cookie.Value)
 	if err != nil {
 		ErrorHandling(err, path, w)
+		return nil
+	}
+
+	err = json.Unmarshal(data, &identity)
+	if err != nil {
+		ErrorHandling(err, path, w)
+		return nil
+	}
+
+	c, err := ftp.Dial(fmt.Sprintf("%s:%d", identity.Host, identity.Port), ftp.DialWithTimeout(5*time.Second)) // соединение с ftp сервером
+	if err != nil {
+		ErrorHandling(err, path, w)
+		return nil
+	}
+
+	err = c.Login(identity.Login, identity.Password) // авторизация на сервере
+	if err != nil {
+		ErrorHandling(err, path, w)
+		return nil
 	}
 
 	return c
@@ -100,15 +126,26 @@ func FTPAuth(path string, w http.ResponseWriter) *ftp.ServerConn {
 func AuthRouterHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
-	host = r.Form["host"][0]
 	i, err := strconv.Atoi(r.Form["port"][0])
 	if err != nil {
 		ErrorHandling(err, "/", w)
 		return
 	}
-	port = i
-	login = r.Form["login"][0]
-	password = r.Form["password"][0]
+
+	identity := FTPIdentity{
+		Host:     r.Form["host"][0],
+		Port:     i,
+		Login:    r.Form["login"][0],
+		Password: r.Form["password"][0],
+	}
+
+	jsonBytes, _ := json.Marshal(identity)
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "identity",
+		Value:   base64.StdEncoding.EncodeToString(jsonBytes),
+		Expires: time.Now().Add(30 * time.Minute),
+	})
 
 	http.Redirect(w, r, "/client/", 301)
 }
@@ -121,7 +158,7 @@ func ClientRouterHandler(w http.ResponseWriter, r *http.Request) {
 		path = path[:n-1]
 	}
 
-	c := FTPAuth(path, w)
+	c := FTPAuth(path, w, r)
 
 	var entries []EntryExtended
 	files, err := EntriesByType(path, c, ftp.EntryTypeFolder) // папки
@@ -163,7 +200,7 @@ func CreateRouterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	c := FTPAuth(current, w)
+	c := FTPAuth(current, w, r)
 
 	err := c.ChangeDir(current)
 	if err != nil {
@@ -199,7 +236,7 @@ func UploadRouterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	c := FTPAuth(current, w)
+	c := FTPAuth(current, w, r)
 
 	err = c.ChangeDir(current)
 	if err != nil {
@@ -235,7 +272,7 @@ func DownloadRouterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	c := FTPAuth(current, w)
+	c := FTPAuth(current, w, r)
 
 	err := c.ChangeDir(current)
 	if err != nil {
@@ -275,7 +312,7 @@ func DeleteFileRouterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	c := FTPAuth(current, w)
+	c := FTPAuth(current, w, r)
 
 	err := c.ChangeDir(current)
 	if err != nil {
@@ -298,12 +335,6 @@ func DeleteFileRouterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// установка дефолтных значений глобальных переменных аутентификации
-	host = "students.yss.su"
-	port = 21
-	login = "ftpiu8"
-	password = "3Ru7yOTA"
-
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./static/css")))) // доступ к стилям
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

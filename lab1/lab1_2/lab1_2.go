@@ -21,7 +21,7 @@ func main() {
 	// на глобальные переменные аутентификации и инициализации сервера
 	flag.StringVar(&host, "h", "185.20.227.83", "ftp server address")
 	flag.StringVar(&path, "path", "/home/iu9_32_17/ftproot", "ftp server root folder")
-	flag.IntVar(&port, "port", 2017, "port of ftp server")
+	flag.IntVar(&port, "port", 2117, "port of ftp server")
 	flag.StringVar(&login, "l", "login", "login for ftp auth")
 	flag.StringVar(&password, "p", "p4$$w0rd", "password for ftp auth")
 

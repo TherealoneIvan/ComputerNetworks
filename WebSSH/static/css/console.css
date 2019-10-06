@@ -1,0 +1,12 @@
+.list-group-item {
+    border: 0px !important;
+    font-size: 1.5rem;
+}
+
+.command {
+    color: green;
+}
+
+.output {
+    color: #f8f9fa;
+}
