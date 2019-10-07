@@ -33,9 +33,10 @@ func main() {
 		Addr: fmt.Sprintf(":%d", port),
 		Handler: func(s ssh.Session) {
 			io.WriteString(s, fmt.Sprintf("You've been connected to %s\n", s.LocalAddr().String()))
+			reader := bufio.NewReader(s)
 		loop:
 			for {
-				text, err := bufio.NewReader(s).ReadString('\n')
+				text, err := reader.ReadString('\n')
 				if err != nil {
 					fmt.Println("GetLines: " + err.Error())
 					break
@@ -61,7 +62,7 @@ func main() {
 					if len(command) < 2 {
 						io.WriteString(s, "\n")
 					} else {
-						io.WriteString(s, strings.Join(command[1:], " ")+"\n")
+						io.WriteString(s, strings.Join(command[1:], " ") + "\n")
 					}
 				default:
 					out, err := exec.Command(command[0], command[1:]...).Output()

@@ -126,17 +126,20 @@ func ExecuteRouterHandler(w http.ResponseWriter, r *http.Request) {
 	// отправка команд
 	fmt.Fprintf(stdin, "cd %s\n", r.Form["path"][0])
 	fmt.Fprintf(stdin, "echo %s\n", divider)
-	fmt.Fprintln(stdin, strings.Join(cmd, " "))
-	fmt.Fprintln(stdin, "echo getpath")
-	fmt.Fprintln(stdin, "pwd")
-	fmt.Fprintln(stdin, "exit")
+	fmt.Fprintf(stdin, "%s\n", strings.Join(cmd, " "))
+	fmt.Fprintf(stdin, "echo getpath\n")
+	fmt.Fprintf(stdin, "pwd\n")
+	fmt.Fprintf(stdin,"%s\n", "exit")
 	// чтение вывода
 	out, _ := ioutil.ReadAll(stdout)
 	outstr := string(out)
 	outstr = outstr[strings.Index(outstr, divider+"\n")+len(divider)+1 : strings.Index(outstr, "getpath\n")]
 	response.List = strings.Split(outstr, "\n")
 	response.Path = string(out)[strings.Index(string(out), "getpath\n")+len("getpath\n"):]
-
+	err = session.Wait()
+	if err != nil {
+		fmt.Println(err)
+	}
 	result, _ := json.Marshal(response)
 	w.Write(result)
 }
