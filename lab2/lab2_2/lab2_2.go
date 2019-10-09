@@ -62,7 +62,7 @@ func main() {
 					if len(command) < 2 {
 						io.WriteString(s, "\n")
 					} else {
-						io.WriteString(s, strings.Join(command[1:], " ") + "\n")
+						io.WriteString(s, strings.Join(command[1:], " ")+"\n")
 					}
 				default:
 					out, err := exec.Command(command[0], command[1:]...).Output()
@@ -80,6 +80,9 @@ func main() {
 		},
 		PasswordHandler: func(ctx ssh.Context, password string) bool {
 			return ctx.User() == "iu9_student" && password == "BMSTU_the_best"
+		},
+		PtyCallback: func(ctx ssh.Context, pty ssh.Pty) bool {
+			return false
 		},
 	}
 
