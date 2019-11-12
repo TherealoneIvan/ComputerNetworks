@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/ssh"
@@ -26,6 +26,8 @@ func main() {
 	flag.StringVar(&path, "path", "cluster.json", "path to cluster info file")
 	flag.StringVar(&cmd, "cmd", "pwd", "command to run")
 	flag.Parse()
+
+	divider := fmt.Sprintf("cmd:%s", cmd)
 
 	var servers []Server
 
@@ -59,11 +61,26 @@ func main() {
 			session, _ := conn.NewSession()
 			defer session.Close()
 
-			var stdoutBuf bytes.Buffer
-			session.Stdout = &stdoutBuf
-			session.Run(cmd)
+			// получение управления вводом и выводом
+			stdin, _ := session.StdinPipe()
+			stdout, _ := session.StdoutPipe()
+			// старт оболочки на удалённой машине
+			err = session.Shell()
+			if err != nil {
+				fmt.Println(err)
+			}
+			// отправка команд
+			fmt.Fprintf(stdin, "echo %s\n", divider)
+			fmt.Fprintf(stdin, "%s\n", cmd)
+			fmt.Fprintf(stdin, "echo getpath\n")
+			fmt.Fprintf(stdin, "pwd\n")
+			fmt.Fprintf(stdin, "%s\n", "exit")
+			// чтение вывода
+			out, _ := ioutil.ReadAll(stdout)
+			outstr := string(out)
+			outstr = outstr[strings.Index(outstr, divider+"\n")+len(divider)+1 : strings.Index(outstr, "getpath\n")]
 
-			resChannel <- fmt.Sprintf("%s\n\n%s\n", servers[j].Host, stdoutBuf.String())
+			resChannel <- outstr
 		}(i)
 	}
 
