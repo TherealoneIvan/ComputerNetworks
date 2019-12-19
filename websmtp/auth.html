@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WebSMTP</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style type="text/css">
+        .button {
+            margin-left: 4.5%;
+        }
+
+        .form {
+            margin-left: 43.5%;
+            margin-top: 20%;
+            white-space: pre-line;
+        }
+
+        body {
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <h1 class="navbar-brand font-weight-light mx-auto">Авторизация на SMTP сервере</h1>
+    </nav>
+    <form class="form" method="post" action="/init">
+        <label for="login">Login:</label>
+        <input type="text" name="login" id="login">
+        <label for="pass">Password:</label>
+        <input type="password" name="pass" id="pass">
+        <label for="mail">Mail:</label>
+        <input list="mails" name="mail" id="mail">
+        <datalist id="mails">
+            <option value="yandex.ru">
+            <option value="mail.ru">
+            <option value="gmail.com">
+        </datalist>
+        <button type="submit" class="button">Войти</button>
+    </form>
+</body>
+
+</html>

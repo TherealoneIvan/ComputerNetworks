@@ -4,5 +4,11 @@
         "password": "BMSTU_the_best",
         "host": "185.20.227.83",
         "port": 2217
+    },
+    {
+        "user": "iu9_32_17",
+        "password": "BMSTUp4$$w0rd",
+        "host": "185.20.227.83",
+        "port": 22
     }
 ]

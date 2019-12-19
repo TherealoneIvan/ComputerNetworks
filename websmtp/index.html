@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WebSMTP</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style type="text/css">
+        .form {
+            width: 70%;
+            height: 70%;
+            white-space: pre-line;
+        }
+
+        .ex {
+            width: 30%;
+        }
+
+        .msg {
+            width: 80%;
+            height: 500px;
+        }
+
+        .button {
+            width: 100px;
+        }
+
+        body {
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="form" action="/send" method="post">
+        <label for="to">To:</label>
+        <input class="ex" type="text" name="to" id="to">
+        <label for="subject">Subject:</label>
+        <input class="ex" type="text" name="subject" id="subject">
+        <label for="msg">Your message:</label>
+        <textarea class="msg" name="msg" id="msg"></textarea>
+        <button class="button" type="submit">Send</button>
+    </form>
+</body>
+
+</html>
